@@ -35,6 +35,4 @@ https://github.com/nihui/opencv-mobile
 * FPS may be lower in dark environment because of longer camera exposure time
 
 ## screenshot
-
-<img src="screenshot_car.jpg" width = "300" height = "200" align=center />
-
+<img src="./screenshot_car.jpg" width="40%" height="40%"/>
