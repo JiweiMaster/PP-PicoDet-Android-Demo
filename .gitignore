@@ -1,0 +1,9 @@
+.idea
+.gradle
+app/.cxx
+app/build
+app/release
+app/src/main/assets/old_assset
+app/src/main/jni/aaa
+app/src/main/jni/ncnn-20210720-android-vulkan
+app/src/main/jni/opencv

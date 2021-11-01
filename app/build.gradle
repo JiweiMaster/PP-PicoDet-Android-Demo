@@ -1,0 +1,35 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+//    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.baidu.picodetncnn"
+        archivesBaseName = "$applicationId"
+        minSdkVersion 24
+    }
+
+    externalNativeBuild {
+        cmake {
+            version "3.10.2"
+            path file('src/main/jni/CMakeLists.txt')
+//            abiFilters "armeabi"
+        }
+
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+
+    }
+//    ndk{
+//        abiFilters "armeabi-v7a"
+//    }
+}
+
+dependencies {
+}
+
+
