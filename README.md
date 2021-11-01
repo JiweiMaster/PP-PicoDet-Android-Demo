@@ -38,4 +38,4 @@ https://github.com/nihui/opencv-mobile
 
 [comment]: <> (<img src="screenshot_car.jpg" width = "300" height = "200" alt="test" align=center />)
 
-!![](./screenshot_car.jpg){:height="50%" width="50%"}
+![](./screenshot_car.jpg){:height="50%" width="50%"}
