@@ -36,6 +36,5 @@ https://github.com/nihui/opencv-mobile
 
 ## screenshot
 
-[comment]: <> (<img src="screenshot_car.jpg" width = "300" height = "200" alt="test" align=center />)
+<img src="screenshot_car.jpg" width = "300" height = "200" align=center />
 
-![](./screenshot_car.jpg){:height="50%" width="50%"}
