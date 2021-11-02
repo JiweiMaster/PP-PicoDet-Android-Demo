@@ -29,7 +29,6 @@ public class TestInferVideo extends Activity {
     NanoDetNcnn nanoDetNcnn = new NanoDetNcnn();
     private int current_model = 0;
     private int current_cpugpu = 0;
-    TextView inferTimeTextView;
     ImageView inferImageView;
     LinearLayout inferLayout;
     TextView fpsTextView;
@@ -37,7 +36,7 @@ public class TestInferVideo extends Activity {
     boolean isShowImgThread = true;
     Thread showImgThread;
 //    int frameCount = 1051;
-    int frameCount = 124;
+    int frameCount = 249;
     boolean isRunThread = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +45,6 @@ public class TestInferVideo extends Activity {
         testDelayBtn = this.findViewById(R.id.testDelayBtn);
         spinnerModel = (Spinner) findViewById(R.id.spinnerModel2);
         spinnerCPUGPU = (Spinner) findViewById(R.id.spinnerCPUGPU2);
-        inferTimeTextView = this.findViewById(R.id.inferTime);
         jumpMainBtn = this.findViewById(R.id.jumptInferPageBtn);
         inferImageView = this.findViewById(R.id.showInferImg);
         inferLayout = this.findViewById(R.id.inferLayout);
@@ -56,14 +54,14 @@ public class TestInferVideo extends Activity {
         testDelayBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isRunThread = true;
-                inferTimeTextView.setText("star cal...");
+                isRunThread = false;
                 double inferTime = nanoDetNcnn.testInferTime(getAssets(), current_model, current_cpugpu);
                 double fps = frameCount*1000/inferTime;
 //                inferTimeTextView.setText("FPS : "+String.valueOf(frameCount*1000/inferTime));
                 DecimalFormat decimalFormat = new DecimalFormat("#.00");
                 String fpsStr = decimalFormat.format(fps);
                 fpsTextView.setText("fps: "+fpsStr);
+                isRunThread = true;
                 getShowImgThread().start();
             }
         });
@@ -81,6 +79,7 @@ public class TestInferVideo extends Activity {
             {
                 if (position != current_model)
                 {
+                    isRunThread = false;
                     current_model = position;
                     System.out.println("current_model => "+current_model);
                     try{
@@ -136,10 +135,11 @@ public class TestInferVideo extends Activity {
                                 public void run() {
                                     Bitmap bitmap = BitmapFactory.decodeFile(TestInferVideo.this.getExternalCacheDir() +"/"+imageName);
                                     inferImageView.setImageBitmap(bitmap);
+//                                    inferImageView.setRotation(90);
                                 }
                             });
                         }
-                        Thread.sleep(300);
+                        Thread.sleep(50);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -151,7 +151,7 @@ public class TestInferVideo extends Activity {
     }
 
     public void copyMP42Cache() {
-        String filename = "out.avi";
+        String filename = "out.mp4";
         File file = new File(TestInferVideo.this.getExternalCacheDir()+"/"+filename);
         Log.d("ncnn: src video dir => ", file.getAbsolutePath());
         if (!file.exists()) {

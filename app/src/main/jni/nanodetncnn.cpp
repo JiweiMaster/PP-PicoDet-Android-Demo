@@ -250,7 +250,7 @@ double imwrite_time=0;
 
 double analysis_cooc128() {
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn: ", "%s", "analysis_cooc128");
-    cv::VideoCapture inputVideo("/storage/emulated/0/Android/data/com.baidu.picodetncnn/cache/out.avi");
+    cv::VideoCapture inputVideo("/storage/emulated/0/Android/data/com.baidu.picodetncnn/cache/out.mp4");
     double start_time = ncnn::get_current_time();
     int frameNum = 0;
     unsigned int objectsNum=0;
@@ -259,16 +259,19 @@ double analysis_cooc128() {
         frameNum++;
         cv::Mat rgb;
         cv::Mat rgb_in;
-        inputVideo>>rgb_in;
-        if(rgb_in.empty()){
+        Mat rgb_out;
+        inputVideo>>rgb_out;
+        if(rgb_out.empty()){
             break;
         }
+        cv::transpose(rgb_out, rgb_in);
         cvtColor(rgb_in, rgb, COLOR_BGR2RGB);
         __android_log_print(ANDROID_LOG_DEBUG, "ncnn: frame number", "%d", frameNum);
         char imgName[1000] = {};
         if (g_nanodet) {
             std::vector<Object> objects;
             if (g_nanodet->mode_type == 0) { // nanodet head
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","nanodet");
                 read_img_time = read_img_time + (ncnn::get_current_time() - time_idx);
                 time_idx = ncnn::get_current_time();
                 g_nanodet->detect(rgb, objects);
@@ -279,11 +282,13 @@ double analysis_cooc128() {
                 draw_img_time = draw_img_time + (ncnn::get_current_time()-time_idx);
             }
             if (g_nanodet->mode_type == 1) { // picodet three head
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","picodet-three");
                 g_nanodet->detectPicoDet(rgb, objects);
                 objectsNum = objectsNum + objects.size();
                 g_nanodet->draw(rgb, objects);
             }
             if (g_nanodet->mode_type == 2) { // pciodet four head
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","picodet-four");
                 read_img_time = read_img_time + (ncnn::get_current_time() - time_idx);
                 time_idx = ncnn::get_current_time();
                 g_nanodet->detectPicoDetFourHead(rgb, objects, 0.45,0.5);
@@ -302,7 +307,21 @@ double analysis_cooc128() {
                 time_idx = ncnn::get_current_time();
                 g_nanodet->draw(rgb, objects);
                 draw_img_time = draw_img_time + (ncnn::get_current_time()-time_idx);
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","yolox");
             }
+            if (g_nanodet->mode_type == 4) {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","detectYoloV5");
+                read_img_time = read_img_time + (ncnn::get_current_time() - time_idx);
+                time_idx = ncnn::get_current_time();
+                g_nanodet->detectYoloV5(rgb, objects);
+                detect_time = detect_time + (ncnn::get_current_time()-time_idx);
+                objectsNum = objectsNum + objects.size();
+                time_idx = ncnn::get_current_time();
+                g_nanodet->draw(rgb, objects);
+                draw_img_time = draw_img_time + (ncnn::get_current_time()-time_idx);
+            }
+            __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "object length = %d",objects.size());
+
         }
 
         time_idx = ncnn::get_current_time();
@@ -540,7 +559,8 @@ JNIEXPORT jdouble JNICALL Java_com_baidu_picodetncnn_NanoDetNcnn_testInferTime(J
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn: draw_img_time:", "%lf", draw_img_time);
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn: detect_time:", "%lf", detect_time);
     __android_log_print(ANDROID_LOG_DEBUG, "ncnn: imwrite_time:", "%lf", imwrite_time);
-    return infertime;
+//    return infertime;
+    return (process_time+infer_time+postprocess_time);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_baidu_picodetncnn_NanoDetNcnn_genVideoByImg(JNIEnv *env, jobject thiz) {

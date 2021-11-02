@@ -43,17 +43,17 @@ public:
 
     int load(AAssetManager* mgr, const char* modeltype, int target_size, const float* mean_vals, const float* norm_vals, bool use_gpu = false);
 
-    int detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.4f, float nms_threshold = 0.5f);
+    int detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.5f, float nms_threshold = 0.5f);
 
     int draw(cv::Mat& rgb, const std::vector<Object>& objects);
 
-    int detectPicoDet(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.4f, float nms_threshold = 0.5f);
+    int detectPicoDet(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.3f, float nms_threshold = 0.5f);
 
-    int detectPicoDetFourHead(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.4f, float nms_threshold = 0.5f);
+    int detectPicoDetFourHead(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.3f, float nms_threshold = 0.5f);
 
     int detectYolox(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.4f, float nms_threshold = 0.5f);
 
-    int detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.4f, float nms_threshold = 0.8f);
+    int detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold = 0.3f, float nms_threshold = 0.5f);
 
     int mode_type = -1;
 

@@ -1033,7 +1033,7 @@ int NanoDet::detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, floa
         const float nms_threshold = 0.9f;
 //        const float norm_vals[3] = {1 / 255.f, 1 / 255.f, 1 / 255.f};
 //        in_pad.substract_mean_normalize(0, norm_vals);
-
+        preprocess_time_picodet = preprocess_time_picodet+(ncnn::get_current_time()-start_time_picodet);
         ncnn::Extractor ex = nanodet.create_extractor();
         ex.input("images", in_pad);
         std::vector<Object> proposals;
@@ -1085,16 +1085,15 @@ int NanoDet::detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, floa
             generate_yolov5_proposals(anchors, 32, in_pad, out, prob_threshold, objects32);
             proposals.insert(proposals.end(), objects32.begin(), objects32.end());
         }
-
+        infer_time_picodet = infer_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+        start_time_picodet = ncnn::get_current_time();
         // sort all proposals by score from highest to lowest
         qsort_descent_inplace(proposals);
-
         // apply nms with nms_threshold
         std::vector<int> picked;
         nms_sorted_bboxes(proposals, picked, nms_threshold);
 
         int count = picked.size();
-
         objects.resize(count);
         for (int i = 0; i < count; i++)
         {
@@ -1131,6 +1130,7 @@ int NanoDet::detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, floa
         } objects_area_greater;
         std::sort(objects.begin(), objects.end(), objects_area_greater);
     }
+    postprocess_time_picodet =  postprocess_time_picodet + (ncnn::get_current_time()-start_time_picodet);
     return 0;
 }
 

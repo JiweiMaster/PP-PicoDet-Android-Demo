@@ -23,13 +23,13 @@
             android:layout_height="wrap_content"
             android:drawSelectorOnTop="true"
             android:entries="@array/cpugpu_array" />
+
     </LinearLayout>
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:layout_marginTop="50dp"
             android:layout_gravity="center"
             android:text="   测试延时    "
             android:id="@+id/testDelayBtn"
@@ -37,10 +37,10 @@
             android:layout_height="wrap_content"/>
 
         <Button
-            android:layout_marginTop="20dp"
+            android:layout_marginLeft="50dp"
             android:layout_gravity="center"
             android:id="@+id/jumptInferPageBtn"
-            android:text="    跳转到摄像头实时推理界面    "
+            android:text="    摄像头实时推理界面    "
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
@@ -64,16 +64,17 @@
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="match_parent">-->
 <!--        </VideoView>-->
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
             <ImageView
+                android:scaleType="fitCenter"
                 android:id="@+id/showInferImg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
             <TextView
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="30dp"
                 android:layout_gravity="right"
                 android:id="@+id/fpsTextView"
                 android:textColor="#ff0000"
