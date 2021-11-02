@@ -1,6 +1,6 @@
-# ncnn-android-nanodet
+# PP-PicoDet-Android-Demo
 
-The NanoDet object detection
+The PicoDet object detection
 
 This is a sample ncnn android project, it depends on ncnn library and opencv
 
