@@ -26,6 +26,7 @@ The PP-Picodet Object Detection Base on [NCNN](https://github.com/Tencent/ncnn) 
 * FPS may be lower in dark environment because of longer camera exposure time
 
 # Demo
+<div>
 <img src="./picodet-small.gif" width="40%" height="40%"/>
 <img src="./nanodet-small.gif" width="40%" height="40%"/>
-<!-- <img src="./screenshot_car.jpg" width="40%" height="40%"/> -->
+</div>
