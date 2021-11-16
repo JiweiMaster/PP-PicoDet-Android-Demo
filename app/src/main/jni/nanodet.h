@@ -61,6 +61,10 @@ public:
     double postprocess_time_picodet = 0;
     double infer_time_picodet = 0;
 
+    double preprocess_time_ = 0;
+    double postprocess_time_ = 0;
+    double infer_time_ = 0;
+
 
 private:
     ncnn::Net nanodet;

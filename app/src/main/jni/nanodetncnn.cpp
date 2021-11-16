@@ -78,21 +78,22 @@ static void clear_Fps_History(){
     }
 }
 
-static int draw_fps(cv::Mat& rgb)
+static int draw_fps(cv::Mat& rgb, double all_time)
 {
     // resolve moving average
     float avg_fps = 0.f;
     {
-        static double t0 = 0.f;
-        double t1 = ncnn::get_current_time();
-        if (t0 == 0.f)
-        {
-            t0 = t1;
-            return 0;
-        }
+//        static double t0 = 0.f;
+//        double t1 = ncnn::get_current_time();
+//        if (t0 == 0.f)
+//        {
+//            t0 = t1;
+//            return 0;
+//        }
 
-        float fps = 1000.f / (t1 - t0);
-        t0 = t1;
+//        float fps = 1000.f / (t1 - t0);
+        float fps = 1000.f / all_time;
+//        t0 = t1;
 
         for (int i = fps_length-1; i >= 1; i--)
         {
@@ -130,59 +131,6 @@ static int draw_fps(cv::Mat& rgb)
     return 0;
 }
 
-//static int draw_fps(cv::Mat& rgb)
-//{
-//    // resolve moving average
-//    float avg_fps = 0.f;
-//    {
-//        static double t0 = 0.f;
-//        static float fps_history[10] = {0.f};
-//
-//        double t1 = ncnn::get_current_time();
-//        if (t0 == 0.f)
-//        {
-//            t0 = t1;
-//            return 0;
-//        }
-//
-//        float fps = 1000.f / (t1 - t0);
-//        t0 = t1;
-//
-//        for (int i = 9; i >= 1; i--)
-//        {
-//            fps_history[i] = fps_history[i - 1];
-//        }
-//        fps_history[0] = fps;
-//
-//        if (fps_history[9] == 0.f)
-//        {
-//            return 0;
-//        }
-//
-//        for (int i = 0; i < 10; i++)
-//        {
-//            avg_fps += fps_history[i];
-//        }
-//        avg_fps /= 10.f;
-//    }
-//
-//    char text[32];
-//    sprintf(text, "FPS=%.2f", avg_fps);
-//
-//    int baseLine = 0;
-//    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
-//
-//    int y = 0;
-//    int x = rgb.cols - label_size.width;
-//
-//    cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
-//                    cv::Scalar(255, 255, 255), -1);
-//
-//    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
-//                cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
-//
-//    return 0;
-//}
 
 static NanoDet* g_nanodet = 0;
 static ncnn::Mutex lock;
@@ -202,13 +150,15 @@ void MyNdkCamera::on_image_render(cv::Mat& rgb) const
         {
             std::vector<Object> objects;
             if(g_nanodet->mode_type == 0){
-                g_nanodet->detect(rgb, objects);
+                g_nanodet->detectPicoDetFourHead(rgb, objects, 0.45,0.55);
             }
             if(g_nanodet->mode_type == 1){
-                g_nanodet->detectPicoDet(rgb, objects);
+//                g_nanodet->detectPicoDet(rgb, objects);
+                g_nanodet->detectPicoDetFourHead(rgb, objects, 0.45,0.55);
             }
             if(g_nanodet->mode_type == 2){
-                g_nanodet->detectPicoDetFourHead(rgb, objects);
+                g_nanodet->detect(rgb, objects);
+
             }
             if(g_nanodet->mode_type == 3){
                 g_nanodet->detectYolox(rgb, objects);
@@ -223,8 +173,15 @@ void MyNdkCamera::on_image_render(cv::Mat& rgb) const
             draw_unsupported(rgb);
         }
     }
+    double process_time = g_nanodet->preprocess_time_;
+    double infer_time = g_nanodet->infer_time_;
+    double postprocess_time = g_nanodet->postprocess_time_;
+    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: process_time:", "%lf", process_time);
+    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: infer_time:", "%lf", infer_time);
+    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: postprocess_time:", "%lf", postprocess_time);
+    double all_time = process_time + infer_time + postprocess_time;
 
-    draw_fps(rgb);
+    draw_fps(rgb, all_time);
 }
 // 无法生成图片，可能和opencv的有关
 void genVideoByImg(){
@@ -270,11 +227,11 @@ double analysis_cooc128() {
         char imgName[1000] = {};
         if (g_nanodet) {
             std::vector<Object> objects;
-            if (g_nanodet->mode_type == 0) { // nanodet head
-                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","nanodet");
+            if (g_nanodet->mode_type == 0) {
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","picodet-four");
                 read_img_time = read_img_time + (ncnn::get_current_time() - time_idx);
                 time_idx = ncnn::get_current_time();
-                g_nanodet->detect(rgb, objects);
+                g_nanodet->detectPicoDetFourHead(rgb, objects, 0.45,0.5);
                 detect_time = detect_time + (ncnn::get_current_time()-time_idx);
                 objectsNum = objectsNum + objects.size();
                 time_idx = ncnn::get_current_time();
@@ -282,16 +239,21 @@ double analysis_cooc128() {
                 draw_img_time = draw_img_time + (ncnn::get_current_time()-time_idx);
             }
             if (g_nanodet->mode_type == 1) { // picodet three head
-                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","picodet-three");
-                g_nanodet->detectPicoDet(rgb, objects);
-                objectsNum = objectsNum + objects.size();
-                g_nanodet->draw(rgb, objects);
-            }
-            if (g_nanodet->mode_type == 2) { // pciodet four head
                 __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","picodet-four");
                 read_img_time = read_img_time + (ncnn::get_current_time() - time_idx);
                 time_idx = ncnn::get_current_time();
                 g_nanodet->detectPicoDetFourHead(rgb, objects, 0.45,0.5);
+                detect_time = detect_time + (ncnn::get_current_time()-time_idx);
+                objectsNum = objectsNum + objects.size();
+                time_idx = ncnn::get_current_time();
+                g_nanodet->draw(rgb, objects);
+                draw_img_time = draw_img_time + (ncnn::get_current_time()-time_idx);
+            }
+            if (g_nanodet->mode_type == 2) { // pciodet four head
+                __android_log_print(ANDROID_LOG_DEBUG, "ncnn:", "%s","nanodet");
+                read_img_time = read_img_time + (ncnn::get_current_time() - time_idx);
+                time_idx = ncnn::get_current_time();
+                g_nanodet->detect(rgb, objects);
                 detect_time = detect_time + (ncnn::get_current_time()-time_idx);
                 objectsNum = objectsNum + objects.size();
                 time_idx = ncnn::get_current_time();
@@ -363,38 +325,41 @@ JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved)
 JNIEXPORT jboolean JNICALL Java_com_baidu_picodetncnn_NanoDetNcnn_loadModel(JNIEnv* env, jobject thiz, jobject assetManager, jint modelid, jint cpugpu)
 {
     int curent_model = -1;
-    if (modelid < 0 || modelid > 7 || cpugpu < 0 || cpugpu > 1)
+    if (modelid < 0 || modelid > 5 || cpugpu < 0 || cpugpu > 1)
     {
         return JNI_FALSE;
     }
-    if(modelid == 0 || modelid == 1){
-        curent_model = 0; //nanodet-m
+    if(modelid == 0){
+        curent_model = 0;
+    }
+    if(modelid == 1){
+        curent_model = 1;
     }
     if(modelid == 2){
-        curent_model = 2; //picodet-s
+        curent_model = 2;
     }
     if(modelid == 3){
-        curent_model = 3; //yolox-nano
+        curent_model = 3;
     }
     if(modelid == 4){
-        curent_model = 4; //yolov5
+        curent_model = 4;
     }
     AAssetManager* mgr = AAssetManager_fromJava(env, assetManager);
     const char* modeltypes[] =
     {
-        "nanodet-m-320",
-        "nanodet-m-320",
-        "picodet-s-320",
-        "yolox-nano-320",
-        "yolov5s",
+            "picodet-s-416",
+            "picodet-l-640",
+            "nanodet-m-416",
+            "yolox-nano",
+            "yolov5s",
     };
     const int target_sizes[] =
     {
-        320,
-        320,
-        320,
-        320,
-        320,
+        416,
+        640,
+        416,
+        416,
+        640,
     };
     const float mean_vals[][3] =
     {
@@ -469,31 +434,43 @@ JNIEXPORT jboolean JNICALL Java_com_baidu_picodetncnn_NanoDetNcnn_setOutputWindo
 
 JNIEXPORT jdouble JNICALL Java_com_baidu_picodetncnn_NanoDetNcnn_testInferTime(JNIEnv *env, jobject thiz, jobject assetManager, jint modelid, jint cpugpu) {
     int curent_model = -1;
-    if (modelid < 0 || modelid > 7 || cpugpu < 0 || cpugpu > 1)
+    if (modelid < 0 || modelid > 5 || cpugpu < 0 || cpugpu > 1)
     {
         return JNI_FALSE;
     }
-    if(modelid == 0 || modelid == 1){
-        curent_model = 0; //nanodet
+    if(modelid == 0){
+        curent_model = 0;
+    }
+    if(modelid == 1){
+        curent_model = 1;
     }
     if(modelid == 2){
-        curent_model = 2;//picodet-fourhead
+        curent_model = 2;
     }
     if(modelid == 3){
-        curent_model = 3;//yolox-nano
+        curent_model = 3;
     }
     if(modelid == 4){
-        curent_model = 4; //yolov5
+        curent_model = 4;
     }
-    const char* modeltypes[] = {
-            "nanodet-m-320",
-            "nanodet-m-320",
-            "picodet-s-320",
-            "yolox-nano-320",
+    const char* modeltypes[] =
+    {
+            "picodet-s-416",
+            "picodet-l-640",
+            "nanodet-m-416",
+            "yolox-nano",
             "yolov5s",
     };
 
-    const int target_sizes[] ={320,320,320,320,320};
+//    const int target_sizes[] ={320,320,320,320,320};
+    const int target_sizes[] =
+            {
+                    416,
+                    640,
+                    416,
+                    416,
+                    640,
+            };
 
     const float mean_vals[][3] =
             {

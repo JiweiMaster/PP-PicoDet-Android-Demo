@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/spinner_1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:background="@color/colorBottomBar"
+            android:layout_height="wrap_content">
+
+            <Spinner
+                android:id="@+id/spinnerModel_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawSelectorOnTop="true"
+                android:textColor="@color/colorText"
+                android:entries="@array/model_array" />
+
+            <Spinner
+                android:id="@+id/spinnerCPUGPU_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawSelectorOnTop="true"
+                android:textColor="@color/colorText"
+                android:entries="@array/cpugpu_array" />
+
+        </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:scaleType="fitCenter"
+                    android:id="@+id/showInferImg"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+                <TextView
+                    android:layout_marginTop="30dp"
+                    android:layout_gravity="right"
+                    android:id="@+id/fpsTextView"
+                    android:textColor="#ff0000"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"/>
+            </FrameLayout>
+
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

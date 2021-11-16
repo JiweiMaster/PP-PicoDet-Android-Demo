@@ -2,14 +2,15 @@
 <resources>
     <string name="app_name">PP-PicoDet</string>
     <string-array name="model_array">
-        <item>nanodet-m-320</item>
-        <item>nanodet-m-320-office</item>
-        <item>picodet-s-320</item>
-        <item>yolox-nano-320</item>
-        <item>yolov5s</item>
+        <item>picodet-s-416</item>
+        <item>picodet-l-640</item>
+        <item>nanodet-m-416</item>
+        <item>yolox-nano-416</item>
+        <item>yolov5s-640</item>
     </string-array>
     <string-array name="cpugpu_array">
         <item>CPU</item>
         <item>GPU</item>
     </string-array>
+    <string name="action_settings">敬请期待新功能</string>
 </resources>

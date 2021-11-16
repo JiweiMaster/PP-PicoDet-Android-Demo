@@ -374,6 +374,7 @@ int NanoDet::detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob
     in_pad.substract_mean_normalize(mean_vals, norm_vals);
 //  images preprocess
     preprocess_time_picodet = preprocess_time_picodet+(ncnn::get_current_time()-start_time_picodet);
+    preprocess_time_ = (ncnn::get_current_time()-start_time_picodet);
     start_time_picodet = ncnn::get_current_time();
     ncnn::Extractor ex = nanodet.create_extractor();
     ex.input("input.1", in_pad);
@@ -409,6 +410,7 @@ int NanoDet::detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob
         proposals.insert(proposals.end(), objects32.begin(), objects32.end());
     }
     infer_time_picodet = infer_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    infer_time_ = (ncnn::get_current_time()-start_time_picodet);
     start_time_picodet = ncnn::get_current_time();
 //    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: nanodet_objects_num", "%d", proposals.size());
     // sort all proposals by score from highest to lowest
@@ -451,6 +453,7 @@ int NanoDet::detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob
 //    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: threshold => ",
 //                        "nms_threshold: %f --> prob_threshold: %f", nms_threshold, prob_threshold);
     postprocess_time_picodet =  postprocess_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    postprocess_time_ =  (ncnn::get_current_time()-start_time_picodet);
     return 0;
 }
 int NanoDet::draw(cv::Mat& rgb, const std::vector<Object>& objects)
@@ -678,6 +681,7 @@ int NanoDet::detectPicoDetFourHead(const cv::Mat& rgb, std::vector<Object>& obje
     in_pad.substract_mean_normalize(mean_vals, norm_vals);
 //  images preprocess
     preprocess_time_picodet = preprocess_time_picodet+(ncnn::get_current_time()-start_time_picodet);
+    preprocess_time_ = (ncnn::get_current_time()-start_time_picodet);
     start_time_picodet = ncnn::get_current_time();
     ncnn::Extractor ex = nanodet.create_extractor();
     ex.input("image", in_pad);
@@ -723,6 +727,7 @@ int NanoDet::detectPicoDetFourHead(const cv::Mat& rgb, std::vector<Object>& obje
         proposals.insert(proposals.end(), objects32.begin(), objects32.end());
     }
     infer_time_picodet = infer_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    infer_time_ = (ncnn::get_current_time()-start_time_picodet);
     start_time_picodet = ncnn::get_current_time();
     // sort all proposals by score from highest to lowest
     qsort_descent_inplace(proposals);
@@ -759,6 +764,7 @@ int NanoDet::detectPicoDetFourHead(const cv::Mat& rgb, std::vector<Object>& obje
     } objects_area_greater;
     std::sort(objects.begin(), objects.end(), objects_area_greater);
     postprocess_time_picodet =  postprocess_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    postprocess_time_ =  (ncnn::get_current_time()-start_time_picodet);
     return 0;
 }
 // yolox
@@ -859,6 +865,7 @@ int NanoDet::detectYolox(const cv::Mat& rgb, std::vector<Object>& objects, float
     in_pad.substract_mean_normalize(mean_vals, norm_vals);
 //  images preprocess
     preprocess_time_picodet = preprocess_time_picodet+(ncnn::get_current_time()-start_time_picodet);
+    preprocess_time_ = (ncnn::get_current_time()-start_time_picodet);
     ncnn::Extractor ex = nanodet.create_extractor();
     ex.input("images", in_pad);
     std::vector<Object> proposals;
@@ -871,6 +878,7 @@ int NanoDet::detectYolox(const cv::Mat& rgb, std::vector<Object>& objects, float
         generate_yolox_proposals(grid_strides, out, prob_threshold, proposals);
     }
     infer_time_picodet = infer_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    infer_time_ = (ncnn::get_current_time()-start_time_picodet);
     start_time_picodet = ncnn::get_current_time();
 //    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: yolox_nano_head_objects_num", "%d", proposals.size());
     // sort all proposals by score from highest to lowest
@@ -903,6 +911,7 @@ int NanoDet::detectYolox(const cv::Mat& rgb, std::vector<Object>& objects, float
 //    __android_log_print(ANDROID_LOG_DEBUG, "ncnn: threshold => ",
 //                        "nms_threshold: %f --> prob_threshold: %f", nms_threshold, prob_threshold);
     postprocess_time_picodet =  postprocess_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    postprocess_time_ =   (ncnn::get_current_time()-start_time_picodet);
     return 0;
 }
 
@@ -1034,6 +1043,7 @@ int NanoDet::detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, floa
 //        const float norm_vals[3] = {1 / 255.f, 1 / 255.f, 1 / 255.f};
 //        in_pad.substract_mean_normalize(0, norm_vals);
         preprocess_time_picodet = preprocess_time_picodet+(ncnn::get_current_time()-start_time_picodet);
+        preprocess_time_ = (ncnn::get_current_time()-start_time_picodet);
         ncnn::Extractor ex = nanodet.create_extractor();
         ex.input("images", in_pad);
         std::vector<Object> proposals;
@@ -1086,6 +1096,7 @@ int NanoDet::detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, floa
             proposals.insert(proposals.end(), objects32.begin(), objects32.end());
         }
         infer_time_picodet = infer_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+        infer_time_ = (ncnn::get_current_time()-start_time_picodet);
         start_time_picodet = ncnn::get_current_time();
         // sort all proposals by score from highest to lowest
         qsort_descent_inplace(proposals);
@@ -1131,6 +1142,7 @@ int NanoDet::detectYoloV5(const cv::Mat& rgb, std::vector<Object>& objects, floa
         std::sort(objects.begin(), objects.end(), objects_area_greater);
     }
     postprocess_time_picodet =  postprocess_time_picodet + (ncnn::get_current_time()-start_time_picodet);
+    postprocess_time_ =   (ncnn::get_current_time()-start_time_picodet);
     return 0;
 }
 
