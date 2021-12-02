@@ -3,7 +3,7 @@ The PP-Picodet Object Detection Base on [NCNN](https://github.com/Tencent/ncnn) 
 
 
 ## APK Download
-[app download link](https://media.githubusercontent.com/media/JiweiMaster/lfs/master/PP-PicoDet.apk)
+[app download link](https://paddledet.bj.bcebos.com/deploy/third_engine/PP-PicoDet.apk)
 
 
 # Quick Start
